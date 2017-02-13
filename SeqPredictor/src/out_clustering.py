@@ -1,4 +1,5 @@
 __author__ = 'billywu'
+__author__ = 'billywu'
 
 import numpy as np
 import re
@@ -44,22 +45,22 @@ for i in range(len(X[0,:])):
 ms=np.array(ms)
 stds=np.array(stds)
 
-np.save('model/inner/all_mean',ms)
-np.save('model/inner/all_std',stds)
+np.save('model/outter/all_mean',ms)
+np.save('model/outter/all_std',stds)
 
 cleaned_data=[]
 outliers=[]
 for l in X:
-    if max(abs(l))<3:
+    if max(abs(l))>=3:
         cleaned_data.append(l)
     else:
         outliers.append(l)
 
 X=np.array(cleaned_data)
 cleaned_data=np.array(cleaned_data)
-pca = PCA(n_components=5)
+pca = PCA(n_components=6)
 pca.fit(X)
-joblib.dump(pca, 'model/inner/pca_cleaned.pkl')
+joblib.dump(pca, 'model/outter/pca_cleaned.pkl')
 X=pca.transform(X)
 ms=[]
 stds=[]
@@ -69,19 +70,19 @@ for i in range(len(X[0,:])):
     X[:,i]=(X[:,i]-m)/std
     ms.append(m)
     stds.append(std)
-np.save('model/inner/cleaned_mean',ms)
-np.save('model/inner/cleaned_std2',stds)
-X=X[np.random.choice(X.shape[0], 30000, replace=False), :]
-for k in range(50,51):
+print stds
+np.save('model/outter/cleaned_mean',ms)
+np.save('model/outter/cleaned_std2',stds)
+for k in range(40,41):
     model = KMeans( n_clusters=k, init='k-means++',random_state=0).fit(X)
     #model = MiniBatchKMeans(init='k-means++', n_clusters=11, batch_size=100,
     #                  n_init=10, max_no_improvement=10, verbose=0).fit(X)
     score=silhouette_score(X,model.labels_)
     print k, score
-#if score>0.59:
-joblib.dump(model, 'model/inner/cleanned_clustering.pkl')
-#else:
-#    print "Clustering not good enough"
+if score>0.50:
+    joblib.dump(model, 'model/outter/cleanned_clustering.pkl')
+else:
+    print "Clustering not good enough"
 #plt.scatter(X[model.labels_==1,0],X[model.labels_==1,1],color='red')
 #plt.scatter(X[model.labels_==0,0],X[model.labels_==0,1],color='blue')
 #plt.scatter(X[model.labels_==2,0],X[model.labels_==2,1],color='green')

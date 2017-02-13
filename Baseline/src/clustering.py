@@ -34,6 +34,7 @@ for l in kmeans.labels_:
 sentences=[]
 for i in range(1000):
     sentences.append(sentence)
+
 model = gensim.models.Word2Vec(sentences, size=100,min_count=1)
 
 model.save_word2vec_format('State_Representation')
